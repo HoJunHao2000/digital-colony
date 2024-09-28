@@ -8,28 +8,28 @@ logger = logging.getLogger(__name__)
 def evaluate():
     data = request.get_json()
     logging.info("Data sent for evaluation: {}".format(data))
-    result = []
-    for i in data:
-        generations = int(i['generations'])
-        colony = i['colony']
-        result.append(solve(colony, generations))
+    colony = data[0].get("colony")
+    result = solve(colony)
     logging.info("Weights result: {}".format(result))
     return jsonify(result)
 
-def solve(colony, generations):
+def solve(colony):
     # Use integers instead of strings for better performance
     colony = [int(digit) for digit in colony]
     
+    weights = []  # List to store weights for each generation
     memo_pairs = {}
 
     # Calculate initial weight once (sum of digits in the colony)
     weight = sum(colony)
+    weights.append(weight)  # Store the initial weight
 
     # Generate 50 generations
-    for _ in range(generations):
+    for _ in range(10):
         colony, weight = next_generation(colony, memo_pairs, weight)
+        weights.append(weight)  # Store the weight for this generation
 
-    return weight  # Return the weights for 10th and 50th generations
+    return [weights[10], weights[10]]  # Return the weights for 10th and 50th generations
 
 def next_generation(colony, memo_pairs, weight):
     n = len(colony)
